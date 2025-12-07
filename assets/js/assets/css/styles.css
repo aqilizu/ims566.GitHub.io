@@ -1,0 +1,86 @@
+/* style.css - UiTM Library */
+body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: #f7f8fb; color: #222; }
+.card { border-radius: 10px; }
+.navbar-brand { font-weight: 600; letter-spacing: 0.2px; }
+.avatar { font-weight:700; }
+.sortable { user-select: none; }
+
+/* small screens spacing */
+@media (max-width: 576px) {
+  .card { margin: 0.5rem; }
+}
+
+/* -------------------------------------
+   UiTM THEME COLORS
+-------------------------------------- */
+:root {
+  --uitm-purple: #490A78;
+  --uitm-darkpurple: #2E0454;
+  --uitm-gold: #FFB800;
+  --uitm-lightpurple: #D9C9EA;
+}
+
+/* -------------------------------------
+   NAVBAR
+-------------------------------------- */
+.navbar {
+  background: var(--uitm-purple) !important;
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+  color: white !important;
+  font-weight: 500;
+}
+
+.navbar-nav .nav-link.active {
+  color: var(--uitm-gold) !important;
+  font-weight: 600;
+}
+
+/* -------------------------------------
+   PAGE HEADER
+-------------------------------------- */
+h2 {
+  font-weight: 700;
+  color: var(--uitm-darkpurple);
+}
+
+/* -------------------------------------
+   PROFILE CARD
+-------------------------------------- */
+.card {
+  border-radius: 12px;
+  border: none;
+  background: var(--uitm-lightpurple);
+}
+
+/* Profile Header */
+#profilePhotoPreview {
+  border: 3px solid var(--uitm-gold) !important;
+}
+
+/* Section Titles */
+.text-uppercase.text-muted {
+  color: var(--uitm-purple) !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--uitm-purple);
+  border: none;
+}
+.btn-primary:hover {
+  background: var(--uitm-darkpurple);
+}
+
+/* Modal Header */
+.modal-header {
+  background: var(--uitm-purple);
+  color: white;
+}
+.btn-close {
+  filter: brightness(0) invert(1);
+}

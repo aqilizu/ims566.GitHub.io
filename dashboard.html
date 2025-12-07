@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UiTM Library — Dashboard</title>
+
+  <!-- BOOTSTRAP CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { background: #F5F5F7; }
+
+    .navbar { background: #500778 !important; }
+    .navbar-brand, .nav-link { color: white !important; font-weight: 500; }
+    .nav-link.active { border-bottom: 2px solid #FFC60B; }
+
+    .summary-card {
+      background: white;
+      border-left: 6px solid #500778;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: 0.2s;
+    }
+    .summary-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    .chart-card, .table-card {
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+    }
+
+    footer { background: #2A2A72; color: white !important; }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">UiTM Library</a>
+
+      <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navmenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="books.html">Books</a></li>
+          <li class="nav-item"><a class="nav-link" href="users.html">Users</a></li>
+          <li class="nav-item"><a class="nav-link" id="logoutBtn" href="#">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 class="fw-bold text-dark">Dashboard</h2>
+      <small id="welcomeText" class="text-muted"></small>
+    </div>
+
+    <div class="row g-4">
+
+      <div class="col-md-4">
+        <div class="summary-card p-3">
+          <h6 class="text-secondary">Total Books</h6>
+          <div class="display-6 fw-bold text-dark" id="totalBooks">—</div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="summary-card p-3">
+          <h6 class="text-secondary">Total Users</h6>
+          <div class="display-6 fw-bold text-dark" id="totalUsers">—</div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="summary-card p-3">
+          <h6 class="text-secondary">Total Times Borrowed</h6>
+          <div class="display-6 fw-bold text-dark" id="totalBorrowed">—</div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="chart-card p-3">
+          <div class="d-flex justify-content-between">
+            <h6 class="fw-bold text-dark">Borrowed by Category</h6>
+            <small class="text-muted">Sample data</small>
+          </div>
+
+          <div style="height:330px;">
+            <canvas id="booksChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="table-card p-3">
+          <h6 class="fw-bold text-dark">Recent Books</h6>
+
+          <div class="table-responsive">
+            <table class="table table-striped table-hover table-sm mb-0" id="recentBooks">
+              <thead class="table-dark">
+                <tr>
+                  <th>ID</th><th>Title</th><th>Author</th><th>Available</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer py-3 text-center">
+    <div class="container small">
+      Uitm Library-Project IMS566
+    </div>
+  </footer>
+
+  <!-- REQUIRED FOR NAVBAR TO WORK -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- CHART JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- YOUR APP JS -->
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    const user = requireAuth();
+    document.getElementById('welcomeText').textContent = `Signed in as ${user.username}`;
+
+    document.getElementById('logoutBtn').addEventListener('click', (e)=>{
+      e.preventDefault();
+      sessionStorage.removeItem('libraryUser');
+      window.location.href = 'index.html';
+    });
+
+    const books = window.SAMPLE_BOOKS;
+    const users = window.SAMPLE_USERS;
+
+    document.getElementById('totalBooks').textContent = books.length;
+    document.getElementById('totalUsers').textContent = users.length;
+    document.getElementById('totalBorrowed').textContent =
+      books.reduce((s,b)=>s+b.borrowed,0);
+
+    const tbody = document.querySelector('#recentBooks tbody');
+    books.slice(0,6).forEach(b=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${b.id}</td><td>${b.title}</td><td>${b.author}</td><td>${b.available}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const categoryMap = {};
+    books.forEach(b => {
+      categoryMap[b.category] = (categoryMap[b.category]||0) + b.borrowed;
+    });
+
+    const categories = Object.keys(categoryMap);
+    const borrowedCounts = categories.map(c => categoryMap[c]);
+
+    new Chart(document.getElementById('booksChart'), {
+      type: 'bar',
+      data: {
+        labels: categories,
+        datasets: [{
+          label: 'Times Borrowed',
+          data: borrowedCounts,
+          borderWidth: 1,
+          backgroundColor: '#FFC60B',
+          borderColor: '#500778'
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+  </script>
+
+</body>
+</html>
